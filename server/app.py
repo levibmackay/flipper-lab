@@ -11,9 +11,10 @@ from flask import Flask, request, jsonify, render_template, session, redirect, u
 app = Flask(__name__)
 app.secret_key = "supersecret123"
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "users.db")
+DB_PATH   = os.path.join(os.path.dirname(__file__), "users.db")
 FLAG_PATH = os.path.join(os.path.dirname(__file__), "flag.txt")
-LOG_PATH = os.path.join(os.path.dirname(__file__), "../requests.log")
+# When running in Docker this resolves to /app/requests.log, which is volume-mounted
+LOG_PATH  = "/app/requests.log"
 
 logging.basicConfig(filename=LOG_PATH, level=logging.INFO, format="%(message)s")
 

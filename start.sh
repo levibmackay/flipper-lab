@@ -1,26 +1,28 @@
 #!/bin/bash
-# Run server + dashboard side by side in tmux
-# Usage: bash start.sh
+# Start the lab: server in Docker, dashboard in your current terminal.
+# Usage:
+#   bash start.sh          — build and start everything
+#   bash start.sh wipe     — destroy container + state, then restart fresh
 
-SESSION="flipper-lab"
-
-if ! command -v tmux &>/dev/null; then
-  echo "tmux not found — install with: sudo apt install tmux"
-  exit 1
-fi
-
+set -e
 cd "$(dirname "$0")"
 
-pip install -q -r requirements.txt
+if [[ "$1" == "wipe" ]]; then
+  echo "Wiping lab..."
+  docker compose down -v --remove-orphans
+  rm -f requests.log
+  echo "Clean. Rebuilding..."
+fi
 
-tmux new-session -d -s "$SESSION" -x 220 -y 50
+# Build and start server container in the background
+docker compose up -d --build
 
-# Left pane: vulnerable server
-tmux send-keys -t "$SESSION:0.0" "python3 server/app.py" Enter
+echo ""
+echo "  Server running at http://$(hostname -I | awk '{print $1}'):5000"
+echo "  Container logs:  docker compose logs -f"
+echo "  Wipe and reset:  bash start.sh wipe"
+echo ""
 
-# Right pane: live dashboard
-tmux split-window -h -t "$SESSION"
-tmux send-keys -t "$SESSION:0.1" "sleep 1 && python3 monitor/dashboard.py" Enter
-
-tmux select-pane -t "$SESSION:0.0"
-tmux attach -t "$SESSION"
+# Run dashboard in this terminal so you can watch attacks live
+pip install -q rich
+python3 monitor/dashboard.py

