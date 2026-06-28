@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="box">
+  <h2>Dashboard</h2>
+  <p>Welcome, <strong>{{ user }}</strong>. Role: <strong>{{ role }}</strong>.</p>
+  <p>Your user profile: <a href="/api/user/2">/api/user/2</a></p>
+</div>
+{% endblock %}

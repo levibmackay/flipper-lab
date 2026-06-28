@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="box">
+  <h2>Network Ping Tool</h2>
+  <form method="GET">
+    <label>Hostname / IP</label>
+    <input name="host" value="{{ host or '' }}">
+    <button type="submit">Ping</button>
+  </form>
+  {% if result %}<pre>{{ result }}</pre>{% endif %}
+</div>
+{% endblock %}

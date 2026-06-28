@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="box">
+  <h2>CorpNet Internal Portal</h2>
+  <p>Welcome to the internal employee portal.</p>
+  {% if user %}<p>Logged in as <strong>{{ user }}</strong>.</p>{% endif %}
+  <p>Available tools: <a href="/tools/ping">Network Ping</a> | <a href="/files">File Browser</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+venv/
+server/users.db
+requests.log
+*.env

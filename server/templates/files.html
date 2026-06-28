@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="box">
+  <h2>File Browser</h2>
+  <form method="GET">
+    <label>Filename</label>
+    <input name="file" value="{{ filename or '' }}" placeholder="readme.txt">
+    <button type="submit">Read</button>
+  </form>
+  {% if content %}<pre>{{ content }}</pre>{% endif %}
+</div>
+{% endblock %}

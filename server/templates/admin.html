@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="box">
+  <h2>Admin Panel</h2>
+  {% if locked %}
+  <div class="error">Access denied. Admin only.</div>
+  {% else %}
+  <p>Welcome, admin.</p>
+  <p>Server flag: <strong style="color:#00ff88">{{ flag }}</strong></p>
+  <p>Users: <a href="/api/user/1">/api/user/1</a> through <a href="/api/user/4">/api/user/4</a></p>
+  {% endif %}
+</div>
+{% endblock %}

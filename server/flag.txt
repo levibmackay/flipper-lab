@@ -1,0 +1,1 @@
+FLAG{bad_usb_wins}
