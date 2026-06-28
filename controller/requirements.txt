@@ -1,0 +1,2 @@
+pyflipper>=0.21
+rich>=13.0.0

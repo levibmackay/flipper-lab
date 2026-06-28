@@ -100,6 +100,37 @@ Without Docker, Bad USB payloads that run system commands would affect your actu
 
 ---
 
+## Remote Flipper control (from SSH)
+
+Plug the Flipper into the Pi's USB port. You can then control it entirely from your SSH session — upload payloads, list what's on the SD card, and trigger Bad USB runs without touching the Flipper.
+
+```bash
+cd controller
+pip install -r requirements.txt
+
+# Check Flipper is detected
+ls /dev/ttyACM0
+
+# Show device info
+python3 flipper_ctl.py info
+
+# List payloads already on the Flipper SD card
+python3 flipper_ctl.py list
+
+# Upload a payload from this repo to the Flipper
+python3 flipper_ctl.py upload ../payloads/exfil_flag.txt
+
+# Run a payload remotely — opens Bad USB app and presses OK
+python3 flipper_ctl.py run exfil_flag.txt
+
+# Clean up
+python3 flipper_ctl.py delete exfil_flag.txt
+```
+
+`run` works by opening the Bad USB app on the Flipper over serial, then sending virtual button presses to navigate the file picker and press OK — all without touching the device.
+
+---
+
 ## File layout
 
 ```
@@ -111,6 +142,9 @@ flipper-lab/
 │   └── templates/          # HTML pages
 ├── monitor/
 │   └── dashboard.py        # Rich live attack dashboard
+├── controller/
+│   ├── flipper_ctl.py      # Remote Flipper control CLI (upload, list, run, delete)
+│   └── requirements.txt
 ├── payloads/               # Flipper Zero DuckyScript Bad USB payloads
 ├── Dockerfile
 ├── docker-compose.yml
