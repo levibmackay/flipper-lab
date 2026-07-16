@@ -151,3 +151,5 @@ flipper-lab/
 ├── start.sh                # Start everything / wipe
 └── requirements.txt        # Dashboard dependencies (Rich)
 ```
+
+_Last updated: 2026-07-16_
