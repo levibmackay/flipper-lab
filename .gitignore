@@ -4,3 +4,4 @@ venv/
 server/users.db
 requests.log
 *.env
+.DS_Store
